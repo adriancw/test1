@@ -4,7 +4,7 @@ require 'yaml'
 
 class EbayTime
 	client = Savon::Client.new {
-		wsdl.document = File.expand_path("~/dev/sample1/ebaySvc.wsdl.xml", __FILE__)
+		wsdl.document = File.expand_path("~/dev/soap1/lib/ebaySvc.wsdl.xml", __FILE__)
 	}
 
 	endpoint = "https://api.sandbox.ebay.com/wsapi"
@@ -25,7 +25,7 @@ class EbayTime
 	endpoint_with_params = endpoint +
 		"?callname=#{action}&siteid=0&appid=#{app_id}&version=#{version}&routing=default"
 
-	resp = client.request :urn, "GeteBayOfficialTime" do
+	xmlResp = client.request :urn, "GeteBayOfficialTime" do
 		soap.endpoint = endpoint_with_params
 		soap.header = {
 		  "urn:RequesterCredentials" => {
@@ -37,9 +37,11 @@ class EbayTime
 		}
 		soap.body = { "Version" => version }
 	end
-
-	respHash = resp.to_hash[:gete_bay_official_time_response]
+	puts '================================'
+	
+	respHash = xmlResp.to_hash[:gete_bay_official_time_response]
+	puts "HashResult=" +  respHash.to_s
+	puts "Timestamp=" + respHash[:timestamp].to_s
 	respJson = respHash.to_json
 	puts "JsonResult=" + respJson
-	puts respJson.class
 end
